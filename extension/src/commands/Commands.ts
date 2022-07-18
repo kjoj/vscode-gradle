@@ -75,6 +75,7 @@ import { Command } from "./Command";
 import { COMMAND_CREATE_PROJECT, COMMAND_CREATE_PROJECT_ADVANCED, CreateProjectCommand } from "./CreateProjectCommand";
 import { HideStoppedDaemonsCommand, HIDE_STOPPED_DAEMONS } from "./HideStoppedDaemonsCommand";
 import { COMMAND_RUN_TASKS, RunTasksCommand } from "./RunTasksCommand";
+import { COMMAND_REFRESH_EXTERNAL, RefreshExternalCommand } from "./RefreshExternalCommand";
 import { ShowStoppedDaemonsCommand, SHOW_STOPPED_DAEMONS } from "./ShowStoppedDaemonsCommand";
 
 export class Commands {
@@ -132,15 +133,14 @@ export class Commands {
         );
         this.registerCommand(COMMAND_CANCEL_BUILD, new CancelBuildCommand(this.client));
         this.registerCommand(COMMAND_CANCEL_TREE_ITEM_TASK, new CancelTreeItemTaskCommand());
-        this.registerCommandWithoutInstrument(
-            COMMAND_REFRESH,
-            new RefreshCommand(
-                this.gradleTaskProvider,
-                this.gradleBuildContentProvider,
-                this.gradleTasksTreeDataProvider,
-                this.recentTasksTreeDataProvider
-            )
+        const refreshCommand = new RefreshCommand(
+            this.gradleTaskProvider,
+            this.gradleBuildContentProvider,
+            this.gradleTasksTreeDataProvider,
+            this.recentTasksTreeDataProvider
         );
+        this.registerCommandWithoutInstrument(COMMAND_REFRESH, refreshCommand);
+        this.registerCommand(COMMAND_REFRESH_EXTERNAL, new RefreshExternalCommand(refreshCommand));
         this.registerCommand(COMMAND_LOAD_TASKS, new LoadTasksCommand(this.gradleTaskProvider));
         this.registerCommandWithoutInstrument(
             COMMAND_REFRESH_DAEMON_STATUS,

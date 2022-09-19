@@ -39,8 +39,7 @@
     "workspaceContains:settings.gradle",
     "workspaceContains:build.gradle.kts",
     "workspaceContains:settings.gradle.kts",
-    "onCommand:gradle.createProject",
-    "onCommand:gradle.createProjectAdvanced"
+    "onCommand:gradle.createProject"
   ],
   "main": "./dist/index.js",
   "contributes": {
@@ -327,11 +326,6 @@
         "command": "gradle.createProject",
         "category": "Gradle",
         "title": "Create a Gradle Java Project..."
-      },
-      {
-        "command": "gradle.createProjectAdvanced",
-        "category": "Gradle",
-        "title": "Create a Gradle Java Project... (Advanced)"
       },
       {
         "command": "gradle.runTasks",

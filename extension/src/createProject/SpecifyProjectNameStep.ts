@@ -4,6 +4,7 @@
 import * as vscode from "vscode";
 import { specifySourcePackageNameStep } from "./SpecifySourcePackageNameStep";
 import { IProjectCreationMetadata, IProjectCreationStep, StepResult } from "./types";
+import { createQuickInputButtons, switchToAdvancedLabel, updateTotalSteps } from "./utils";
 
 export class SpecifyProjectNameStep implements IProjectCreationStep {
     public async run(metadata: IProjectCreationMetadata): Promise<StepResult> {
@@ -21,16 +22,7 @@ export class SpecifyProjectNameStep implements IProjectCreationStep {
             const validationMessage: string | undefined = this.isValidProjectName(metadata.projectName);
             inputBox.enabled = validationMessage === undefined;
             inputBox.validationMessage = validationMessage;
-            if (metadata.steps.length) {
-                inputBox.buttons = [vscode.QuickInputButtons.Back];
-                disposables.push(
-                    inputBox.onDidTriggerButton((item) => {
-                        if (item === vscode.QuickInputButtons.Back) {
-                            resolve(StepResult.PREVIOUS);
-                        }
-                    })
-                );
-            }
+            inputBox.buttons = createQuickInputButtons(metadata);
             disposables.push(
                 inputBox.onDidChangeValue(() => {
                     const validationMessage: string | undefined = this.isValidProjectName(inputBox.value);
@@ -42,6 +34,15 @@ export class SpecifyProjectNameStep implements IProjectCreationStep {
                     metadata.steps.push(specifyProjectNameStep);
                     metadata.nextStep = !metadata.isAdvanced ? undefined : specifySourcePackageNameStep;
                     resolve(StepResult.NEXT);
+                }),
+                inputBox.onDidTriggerButton((item) => {
+                    if (item === vscode.QuickInputButtons.Back) {
+                        resolve(StepResult.PREVIOUS);
+                    } else if (item.tooltip === switchToAdvancedLabel) {
+                        metadata.isAdvanced = true;
+                        updateTotalSteps(metadata);
+                        resolve(StepResult.RESTART);
+                    }
                 }),
                 inputBox.onDidHide(() => {
                     resolve(StepResult.STOP);
